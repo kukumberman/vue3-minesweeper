@@ -1,0 +1,25 @@
+{
+  "stages": {
+    "newbie": {
+      "size": {
+        "x": 9,
+        "y": 9
+      },
+      "bombCount": 10
+    },
+    "amateur": {
+      "size": {
+        "x": 16,
+        "y": 16
+      },
+      "bombCount": 40
+    },
+    "professional": {
+      "size": {
+        "x": 30,
+        "y": 16
+      },
+      "bombCount": 99
+    }
+  }
+}
