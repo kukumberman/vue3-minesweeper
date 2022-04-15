@@ -55,7 +55,7 @@ export default class Grid {
   convertTo2d(index) {
     return new Vector2(
       index % this.size.x,
-      Math.floor(index / this.size.y)
+      Math.floor(index / this.size.x) // is fixed now?
     )
   }
 }
