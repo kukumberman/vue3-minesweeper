@@ -1,10 +1,34 @@
 <template>
-  <GridView
-    :size="grid.size"
-    :cells="cells"
-    @leftClick="onCellLeftClick"
-    @rightClick="onCellRightClick"
-  />
+  <div v-if="!gameplayState">
+    <div>
+      <span>Seed</span>
+      <input type="text" v-model="seed">
+      <button @click="randomizeSeed">Randomize</button>
+    </div>
+    <section
+      v-for="(stage, i) in stages"
+      :key="i"
+    >
+      <input type="radio" :id="stage.name" :value="i" v-model="stageIndex">
+      <label :for="stage.name">{{ stage.name }}</label>
+    </section>
+    <div>
+      <button @click="play">Play</button>
+    </div>
+  </div>
+  <div v-else>
+    <div>
+      <button @click="backToMain">Menu</button>
+      <button @click="revealCells">Reveal cells</button>
+    </div>
+    <GridView
+      :size="grid.size"
+      :cells="cells"
+      @leftClick="onCellLeftClick"
+      @rightClick="onCellRightClick"
+    />
+  </div>
+  
 </template>
 
 <script>
@@ -20,39 +44,67 @@ export default {
   },
   data() {
     return {
-      seed: "123",
-      stage: null,
+      seed: "3301",
+      stages: [],
+      stageIndex: 0,
       grid: null,
-      bombCount: 10,
       cells: [],
+      gameplayState: false,
     }
   },
   created() {
+    this.stages = config.stages
+
     const params = new URLSearchParams(window.location.search)
     
-    if (params.has("seed")) {
-      this.seed = params.get("seed")
+    if (!params.has("seed")) {
+      return
     }
 
-    if (params.has("stage")) {
-      const stage = params.get("stage")
-      if (config.stages[stage]) {
-        this.stage = config.stages[stage]
-      }
-      else {
-        this.stage = config.stages.newbie
-      }
-    }
-    else {
-      this.stage = config.stages.newbie
+    if (!params.has("stage")) {
+      return
     }
 
-    this.grid = new Grid(this.stage.size.x, this.stage.size.y)
-  },
-  mounted() {
+    this.seed = params.get("seed")
+
+    const stageName = params.get("stage")
+    let stageIndex = this.stages.findIndex(s => s.name === stageName)
+    if (stageIndex === -1) {
+      stageIndex = 0
+    }
+    this.stageIndex = stageIndex
+
     this.createGrid()
+    this.gameplayState = true
+  },
+  computed: {
+    stage() {
+      return this.stages[this.stageIndex]
+    }
   },
   methods: {
+    randomizeSeed() {
+      this.seed = this.getRandomSeed()
+    },
+    play() {
+      this.updateWindowQueryParams()
+      this.createGrid()
+      this.gameplayState = true
+    },
+    backToMain() {
+      this.gameplayState = false
+      window.history.replaceState(null, "(although most browsers will ignore this parameter)", window.location.pathname)
+    },
+    revealCells() {
+      this.cells.forEach(cell => cell.isClicked = true)
+    },
+    updateWindowQueryParams() {
+      const { origin, pathname } = window.location
+      let url = origin + pathname
+      // ! "qs" module instead?
+      url += "?seed=" + this.seed + "&stage=" + this.stages[this.stageIndex].name
+      window.history.replaceState(null, "(although most browsers will ignore this parameter)", url)
+    },
     getRandomSeed() {
       return (Date.now() % 0xffff).toString(16)
     },
@@ -63,6 +115,7 @@ export default {
       alert("todo: lose logic")
     },
     createGrid() {
+      this.grid = new Grid(this.stage.size.x, this.stage.size.y)
       const count = this.grid.size.x * this.grid.size.y
 
       // ! fill empty cells
@@ -98,7 +151,7 @@ export default {
         this.cells[bombIndex].isBomb = true
       })
     },
-    onCellLeftClick(index) {
+    onCellLeftClick(event, index) {
       const cell = this.cells[index]
       if (cell.isMarked) {
         return
@@ -118,7 +171,7 @@ export default {
         }
       }
     },
-    onCellRightClick(index) {
+    onCellRightClick(event, index) {
       const cell = this.cells[index]
       if (!cell.isClicked) {
         cell.isMarked = !cell.isMarked
@@ -146,5 +199,16 @@ export default {
 <style>
 body {
   user-select: none;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>

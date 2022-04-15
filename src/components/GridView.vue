@@ -5,8 +5,8 @@
       v-for="(cell, i) in cells"
       :key="i"
       :cell="cell"
-      @click="$emit('leftClick', i)"
-      @contextmenu.prevent="$emit('rightClick', i)"
+      @click="$emit('leftClick', $event, i)"
+      @contextmenu.prevent="$emit('rightClick', $event, i)"
     />
   </div>
 </template>
@@ -30,6 +30,12 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      fontSize: 35,
+      cellSize: 50,
+    }
+  },
   computed: {
     // containerStyle() {
     //   return {
@@ -42,24 +48,30 @@ export default {
     },
     y() {
       return this.size.y
+    },
+    cellSizeInPixels() {
+      return this.cellSize + "px"
+    },
+    fontSizeInPixels() {
+      return this.fontSize + "px"
     }
   },
 }
 </script>
 
-<style scoped>
+<style>
 .container {
   display: grid;
   /* grid-template-columns: repeat(var(--grid-x), 50px); */
   /* grid-template-rows: repeat(var(--grid-y), 50px); */
-  grid-template-columns: repeat(v-bind("size.x"), 50px);
-  grid-template-rows: repeat(v-bind("size.y"), 50px);
-  grid-gap: 5px;
+  grid-template-columns: repeat(v-bind("size.x"), v-bind("cellSizeInPixels"));
+  grid-template-rows: repeat(v-bind("size.y"), v-bind("cellSizeInPixels"));
+  /* grid-gap: 5px; */
 }
 
 .cell {
   border: 1px solid black;
-  font-size: 40px;
+  font-size: v-bind("fontSizeInPixels");
   text-align: center;
 }
 </style>
