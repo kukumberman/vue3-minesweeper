@@ -15,9 +15,9 @@
 
 <script>
 import GridView from "@/components/GridView"
-import { enumerableRange } from "@/utils/utils.js"
-import { Random } from "@/utils/Random.js"
-import Grid from "@/utils/Grid.js"
+import { enumerableRange } from "@/core/utils.js"
+import { Random } from "@/core/Random.js"
+import Grid from "@/core/Grid.js"
 
 export default {
   emits: [

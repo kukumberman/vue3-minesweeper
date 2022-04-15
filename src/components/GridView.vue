@@ -13,7 +13,7 @@
 
 <script>
 import Cell from "@/components/Cell.vue"
-import Vector2 from "@/utils/Vector2.js"
+import Vector2 from "@/core/Vector2.js"
 
 export default {
   components: {
