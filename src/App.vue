@@ -17,38 +17,31 @@
     </div>
   </div>
   <div v-else>
-    <div>
-      <button @click="backToMain">Menu</button>
-      <button @click="revealCells">Reveal cells</button>
-    </div>
-    <GridView
-      :size="grid.size"
-      :cells="cells"
-      @leftClick="onCellLeftClick"
-      @rightClick="onCellRightClick"
+    <Minesweeper
+      :seed="seed"
+      :x="stage.size.x"
+      :y="stage.size.y"
+      :bombCount="stage.bombCount"
+      @win="winHandler"
+      @lose="loseHandler"
     />
   </div>
   
 </template>
 
 <script>
-import GridView from "@/components/GridView"
-import { enumerableRange } from "@/utils/utils.js"
-import { Random } from "@/utils/Random.js"
-import Grid from "@/utils/Grid.js"
 import config from "@/config.json"
+import Minesweeper from "@/components/Minesweeper"
 
 export default {
   components: {
-    GridView,
+    Minesweeper,
   },
   data() {
     return {
       seed: "3301",
       stages: [],
       stageIndex: 0,
-      grid: null,
-      cells: [],
       gameplayState: false,
     }
   },
@@ -74,7 +67,6 @@ export default {
     }
     this.stageIndex = stageIndex
 
-    this.createGrid()
     this.gameplayState = true
   },
   computed: {
@@ -88,15 +80,11 @@ export default {
     },
     play() {
       this.updateWindowQueryParams()
-      this.createGrid()
       this.gameplayState = true
     },
     backToMain() {
       this.gameplayState = false
       window.history.replaceState(null, "(although most browsers will ignore this parameter)", window.location.pathname)
-    },
-    revealCells() {
-      this.cells.forEach(cell => cell.isClicked = true)
     },
     updateWindowQueryParams() {
       const { origin, pathname } = window.location
@@ -108,90 +96,12 @@ export default {
     getRandomSeed() {
       return (Date.now() % 0xffff).toString(16)
     },
-    winLogic() {
+    winHandler() {
       alert("todo: win logic")
     },
-    loseLogic() {
+    loseHandler() {
       alert("todo: lose logic")
-    },
-    createGrid() {
-      this.grid = new Grid(this.stage.size.x, this.stage.size.y)
-      const count = this.grid.size.x * this.grid.size.y
-
-      // ! fill empty cells
-      this.cells = enumerableRange(0, count).map(index => {
-        return {
-          index,
-          grid: this.grid.convertTo2d(index),
-          isBomb: false,
-          isClicked: false,
-          isMarked: false
-        }
-      })
-
-      // ! fill random cells with bombs
-      this.fillRandomBombs()
-
-      // ! calculate bomb-neighbour count for each cell
-      this.cells.forEach(cell => {
-        cell.count = this.grid.getNeighbours(cell.grid)
-          .map(index => this.cells[index])
-          .filter(c => c.isBomb)
-          .length
-      })
-    },
-    fillRandomBombs() {
-      const count = this.grid.size.x * this.grid.size.y
-      const indexes = enumerableRange(0, count)
-
-      // ! index of cell where bomb should be placed
-      const candidates = Random.shuffleArray(indexes, this.seed).slice(0, this.stage.bombCount)
-
-      candidates.forEach(bombIndex => {
-        this.cells[bombIndex].isBomb = true
-      })
-    },
-    onCellLeftClick(event, index) {
-      const cell = this.cells[index]
-      if (cell.isMarked) {
-        return
-      }
-
-      if (cell.isBomb) {
-        this.cells.filter(c => c.isBomb).forEach(c => c.isClicked = true)
-        this.loseLogic()
-      }
-      else {
-        this.revealCell(cell)
-
-        const revealedLength = this.cells.filter(cell => cell.isClicked).length
-        const win = revealedLength === this.cells.length - this.stage.bombCount
-        if (win) {
-          this.winLogic()
-        }
-      }
-    },
-    onCellRightClick(event, index) {
-      const cell = this.cells[index]
-      if (!cell.isClicked) {
-        cell.isMarked = !cell.isMarked
-        // ! win if all bomb cells is marked
-        const markedBombsCount = this.cells.filter(cell => cell.isBomb && cell.isMarked).length
-        const win = markedBombsCount === this.stage.bombCount
-        if (win) {
-          this.winLogic()
-        }
-      }
-    },
-    revealCell(cell) {
-      if (cell.isClicked) {
-        return
-      }
-      cell.isClicked = true
-      const neighbours = this.grid.getNeighbours(cell.grid).map(index => this.cells[index])
-      const mines = neighbours.filter(c => c.isBomb)
-      if (mines.length === 0) neighbours.forEach(c => this.revealCell(c))
-    },
+    }
   },
 }
 </script>
