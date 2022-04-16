@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div>
-      <button @click="backToMain">Menu</button>
-      <button @click="revealCells">Reveal cells</button>
-    </div>
+    <button @click="revealCells">Reveal cells</button>
     <GridView
       :size="grid.size"
       :cells="cells"
@@ -29,11 +26,11 @@ export default {
       type: String,
       required: true
     },
-    x: {
+    width: {
       type: Number,
       required: true
     },
-    y: {
+    height: {
       type: Number,
       required: true
     },
@@ -65,7 +62,7 @@ export default {
       this.cells.forEach(cell => cell.isClicked = true)
     },
     createGrid() {
-      this.grid = new Grid(this.x, this.y)
+      this.grid = new Grid(this.width, this.height)
       this.fillEmptyCells()
       this.fillRandomBombs()
       this.calculateCellsNeighbors()

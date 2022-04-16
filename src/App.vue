@@ -10,17 +10,18 @@
       :key="i"
     >
       <input type="radio" :id="stage.name" :value="i" v-model="stageIndex">
-      <label :for="stage.name">{{ stage.name }}</label>
+      <label :for="stage.name">{{ formatStage(stage) }}</label>
     </section>
     <div>
       <button @click="play">Play</button>
     </div>
   </div>
   <div v-else>
+    <button @click="backToMain">Menu</button>
     <Minesweeper
       :seed="seed"
-      :x="stage.size.x"
-      :y="stage.size.y"
+      :width="stage.size.x"
+      :height="stage.size.y"
       :bombCount="stage.bombCount"
       @win="winHandler"
       @lose="loseHandler"
@@ -101,6 +102,10 @@ export default {
     },
     loseHandler() {
       alert("todo: lose logic")
+    },
+    formatStage(stage) {
+      const { name, size, bombCount } = stage
+      return `${name} (${size.x}x${size.y} ${bombCount}💣)`
     }
   },
 }
@@ -109,16 +114,5 @@ export default {
 <style>
 body {
   user-select: none;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-
-#app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 </style>
