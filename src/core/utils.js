@@ -12,14 +12,14 @@ export function shuffleArray(array) {
 }
 
 /**
- * Returns a random floating-point number between 0.0 and 1.0.
+ * Returns a random floating-point number between 0 (inclusive) and 1 (exclusive) for specified seed
  * @param {string} seed 
  * @returns 
  */
 export function pseudoRandom(seed) {
   const hash = crypto.createHash("sha256").update(seed).digest("hex")
   const substr = hash.substring(0, 4)
-  const value01 = parseInt(substr, 16) % (0xffff + 1) / 0xffff
+  const value01 = parseInt(substr, 16) / (0xffff + 1)
   return value01
 }
 
