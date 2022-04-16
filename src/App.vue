@@ -27,16 +27,18 @@
       @lose="loseHandler"
     />
   </div>
-  
+  <FooterView />
 </template>
 
 <script>
 import config from "@/config.json"
 import Minesweeper from "@/components/Minesweeper"
+import FooterView from "@/components/FooterView"
 
 export default {
   components: {
     Minesweeper,
+    FooterView,
   },
   data() {
     return {
