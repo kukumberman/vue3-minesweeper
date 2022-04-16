@@ -1,0 +1,1 @@
+.container{display:grid;grid-template-columns:repeat(var(--429e6b87),var(--11445c91));grid-template-rows:repeat(var(--429e6b88),var(--11445c91))}.cell{border:1px solid #000;font-size:var(--705fe3fe);text-align:center}body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
